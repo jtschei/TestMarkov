@@ -1,4 +1,4 @@
-file <- "~/TestMarkov/data/alice29.txt"
+file <- "~/TestMarkov/data/alice29.txt.gz"
 raw_words <- scan(file, what = character())
 
 
@@ -25,6 +25,9 @@ process_word <- function(word,alpha_matrix) {
     if (!is.na(prev_c)) {
       alpha_matrix <- inc_matrix(prev_c,c,alpha_matrix)
     }
+    else {
+      alpha_matrix <- inc_matrix(space,c,alpha_matrix)
+    }
     prev_c = c
   }
   alpha_matrix <- inc_matrix(c,space,alpha_matrix)
@@ -38,6 +41,12 @@ for (word in clean_words) {
   alpha_matrix <- process_word(word,alpha_matrix)
 }
 
-alpha_matrix <- alpha_matrix / sum(alpha_matrix)
+for (c in dims) {
+  alpha_matrix[c,] <- alpha_matrix[c,] / sum(alpha_matrix[c,])  
+}
 
 
+library(markovchain)
+mcWord <- new("markovchain", states = dims, byrow = TRUE, transitionMatrix = alpha_matrix, name = "Word")
+
+plot(mcWord)
