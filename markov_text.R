@@ -41,12 +41,35 @@ for (word in clean_words) {
   alpha_matrix <- process_word(word,alpha_matrix)
 }
 
+
+
 for (c in dims) {
   alpha_matrix[c,] <- alpha_matrix[c,] / sum(alpha_matrix[c,])  
 }
 
+###
 
 library(markovchain)
 mcWord <- new("markovchain", states = dims, byrow = TRUE, transitionMatrix = alpha_matrix, name = "Word")
 
 plot(mcWord)
+
+###
+
+init_state <-array(rep(0,27),dimnames=list(dims))
+init_state["a"] <- 1
+
+steps<-4
+finalState<-init_state*mcWord^steps
+finalState
+
+###
+
+alpha_seq <- c()
+for (word in raw_words) {
+  alpha_seq <- c(alpha_seq," ",strsplit(word, "")[[1]])
+}
+
+myFit<-markovchainFit(data=alpha_seq,confidencelevel = .9,method = "mle")
+summary(myFit)
+myFit
